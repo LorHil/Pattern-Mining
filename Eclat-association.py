@@ -6,7 +6,8 @@ def eclat(prefix, items):
             i,itids = items.pop()
             isupp = len(itids)
             if isupp >= minsup:
-              print(sorted(prefix+[i]), ':', isupp)  # Output all frequent pairs
+              if len(prefix+[i]) >= 3: #Only print itemsets of minimum 3 elements
+                print(sorted(prefix+[i]), ':', isupp)  # Output all frequent pairs
               suffix = [] 
               for j, ojtids in items:
                   jtids = itids & ojtids
@@ -17,22 +18,26 @@ def eclat(prefix, items):
 if __name__ == '__main__':
     #initialize parameters
     data = {}
-    minsup   = 130
+    minsup   = 250
     trans = 0
     filename = '2019-Dec.csv'
     #start time for program
     timestart = time.time()
-    item_def = row.split(',')[2]
-    transaction_def = row.split(',')[7]
+    item_def = 5  # column ITEM BRAND
+    transaction_def = 7  # TRANSACTION = USER ID
+    
 
 
     f = open('2019-Dec.csv', mode='r')
     for row in f:
-        trans = transaction_def  # User ID
-        item =  item_def   # 3th column is the one with the itemID
-        if item not in data:
-            data[item] = set()
-        data[item].add(trans)   # add does not add an element to the set if it is already in the set
+        trans = row.split(',')[transaction_def]  
+        item =  row.split(',')[item_def] 
+
+        if item is not '':
+            if item not in data:
+                data[item] = set()
+            if row.split(',')[1] == 'purchase':  # comment if you want all types of transactions - here only put in cart
+                data[item].add(trans)   # add does not add an element to the set key if it is already in the set
     f.close()
     eclat([], sorted(data.items(), key=lambda item: len(item[1]), reverse=True))
     timestop = time.time()
